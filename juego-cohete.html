@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>XLito Rocket — Juego</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+  .game-wrap{max-width:760px; margin:0 auto;}
+  .pixel-font{font-family:'Press Start 2P', monospace;}
+  .game-hud{display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; font-family:'Press Start 2P', monospace; font-size:11px; color:var(--ink-soft); flex-wrap:wrap; gap:10px;}
+  .game-hud strong{color:var(--accent); font-family:'Press Start 2P', monospace;}
+  .combo-badge{
+    display:inline-flex; align-items:center; gap:4px; padding:5px 10px;
+    background:#1D9E75; color:#fff; font-weight:700; font-size:10px; font-family:'Press Start 2P', monospace;
+    opacity:0; transition:opacity .2s ease; border:2px solid #0b4a3d;
+  }
+  .combo-badge.active{opacity:1;}
+  #gameCanvas{
+    display:block; width:100%; background:#101a2c;
+    border-radius:0; border:4px solid #0a0e18; box-shadow:0 0 0 2px #7fd4d4, inset 0 0 30px rgba(0,0,0,.5);
+    touch-action:none; cursor:pointer; image-rendering:pixelated;
+  }
+  .game-controls-hint{text-align:center; font-size:11px; color:var(--muted); margin-top:10px; font-family:'Press Start 2P', monospace;}
+  .game-overlay{
+    position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    background:rgba(11,14,24,.94); color:#fff; text-align:center; padding:24px; gap:14px; font-family:'Press Start 2P', monospace;
+  }
+  .game-stage{position:relative;}
+  .quiz-overlay{
+    position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    background:rgba(16,26,44,.97); padding:24px; gap:14px; text-align:center; font-family:'Press Start 2P', monospace;
+  }
+  .quiz-overlay h3{font-size:13px; color:#fff; line-height:1.6; max-width:400px;}
+  .quiz-opt{
+    display:block; width:100%; max-width:340px; padding:10px 14px; margin:5px auto;
+    border:3px solid #7fd4d4; background:#101a2c; color:#7fd4d4; font-weight:600; cursor:pointer;
+    font-family:'Press Start 2P', monospace; font-size:10px;
+  }
+  .quiz-opt:hover{background:#1D9E75; color:#fff;}
+  .quiz-timer-bar{width:100%; max-width:300px; height:8px; background:#0a0e18; overflow:hidden; border:2px solid #7fd4d4;}
+  .quiz-timer-fill{height:100%; background:#ffd88a;}
+  .sound-toggle{
+    position:absolute; top:10px; right:10px; z-index:5; background:#101a2c; border:2px solid #7fd4d4;
+    color:#7fd4d4; font-family:'Press Start 2P', monospace; font-size:10px; padding:6px 10px; cursor:pointer;
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="index.html" class="logo-mark" style="display:flex; align-items:center; gap:8px;"><img src="assets/logo-icon.png" alt="XLito" style="height:62px; width:auto; margin:-10px 0;">XLito <span>· Excel</span></a>
+    <div class="nav-menu">
+      <button class="nav-menu-btn" id="nav-menu-btn" aria-expanded="false" aria-controls="nav-panel">Explorar el sitio <span class="chev">▾</span></button>
+      <div class="nav-panel" id="nav-panel">
+        <div><p class="nav-group-title">El curso</p>
+          <a href="niveles.html">Niveles, temarios y precios</a>
+          <a href="como-funciona.html">Cómo funciona</a>
+        </div>
+        <div><p class="nav-group-title">Conócenos</p>
+          <a href="nosotros.html">Sobre XLito</a>
+          <a href="testimonios.html">Testimonios</a>
+          <a href="faq.html">Preguntas frecuentes</a>
+        </div>
+        <div><p class="nav-group-title">Empieza</p>
+          <a href="recursos.html">Recursos gratis</a>
+          <a href="quiz.html">¿Qué nivel soy?</a>
+          <a href="juego-cohete.html" class="current">Juega: Cohete XLito</a>
+          <a href="inscripcion.html">Inscripción</a>
+        </div>
+      </div>
+    </div>
+    <a href="inscripcion.html" class="btn">Inscríbete</a>
+  </div>
+</nav>
+
+<header class="page-hero">
+  <div class="wrap">
+    <p class="eyebrow">Modo juego</p>
+    <h1>Cohete XLito</h1>
+    <p>Esquiva los errores de Excel, recoge funciones, y responde las preguntas relámpago para sumar puntos extra.</p>
+  </div>
+</header>
+
+<section>
+  <div class="wrap game-wrap">
+    <div class="game-hud">
+      <div>SCORE: <strong id="hud-score">0</strong></div>
+      <div class="combo-badge" id="hud-combo">COMBO x<span id="hud-combo-n">1</span></div>
+      <div>BEST: <strong id="hud-best">0</strong></div>
+    </div>
+
+    <div class="game-stage">
+      <button class="sound-toggle" id="soundToggle">🔊 ON</button>
+      <canvas id="gameCanvas" width="900" height="440"></canvas>
+
+      <div class="game-overlay" id="startOverlay">
+        <h2 style="font-size:22px; color:#7fd4d4;">COHETE XLITO</h2>
+        <p style="max-width:400px; font-size:11px; color:#cfe0ea; line-height:1.8;">Usa ↑ ↓ o W/S para moverte, o arrastra en pantallas táctiles. Esquiva los errores rojos, recoge las funciones verdes y responde las preguntas relámpago.</p>
+        <button class="btn pixel-font" id="startBtn" style="font-size:11px;">EMPEZAR</button>
+      </div>
+
+      <div class="game-overlay" id="overOverlay" style="display:none;">
+        <h2 style="font-size:20px; color:#ff6b6b;">GAME OVER</h2>
+        <p id="overScore" style="font-size:12px; color:#cfe0ea; line-height:1.8;"></p>
+        <button class="btn pixel-font" id="retryBtn" style="font-size:11px;">JUGAR DE NUEVO</button>
+      </div>
+
+      <div class="quiz-overlay" id="quizOverlay" style="display:none;">
+        <p style="margin:0; font-size:9px; color:#ffd88a;">PREGUNTA RELÁMPAGO — +50 PTS</p>
+        <h3 id="quizQuestion"></h3>
+        <div id="quizOptions"></div>
+        <div class="quiz-timer-bar"><div class="quiz-timer-fill" id="quizTimerFill"></div></div>
+      </div>
+    </div>
+
+    <p class="game-controls-hint">↑↓ / WS · TOCA Y ARRASTRA</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-logo" id="footer-logo" style="display:flex; align-items:center; justify-content:center; gap:8px;">
+      <img src="assets/logo-icon.png" alt="" style="height:32px; width:auto;">
+      <span style="font-family:var(--serif); font-weight:800; font-size:22px; background:linear-gradient(135deg, #ffffff, #ffd88a); -webkit-background-clip:text; background-clip:text; color:transparent;">XLito</span>
+    </div>
+    <div class="socials">
+      <a href="https://www.instagram.com/xlito_excel" target="_blank" rel="noopener" class="social-link" style="display:inline-flex; align-items:center; gap:6px; color:#D6249F;"><svg width="18" height="18" viewBox="0 0 24 24"><defs><linearGradient id="igGrad2" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#FEE411"/><stop offset="35%" stop-color="#FD5949"/><stop offset="70%" stop-color="#D6249F"/><stop offset="100%" stop-color="#285AEB"/></linearGradient></defs><rect x="2" y="2" width="20" height="20" rx="5" fill="none" stroke="url(#igGrad2)" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="url(#igGrad2)" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1.2" fill="url(#igGrad2)"/></svg> Instagram</a><a href="https://www.tiktok.com/@xlito_excel" target="_blank" rel="noopener" class="social-link" style="display:inline-flex; align-items:center; gap:6px; color:#e5e9ef;"><svg width="18" height="18" viewBox="0 0 24 24" fill="#000"><path d="M12.5 2h3.2c.2 1.6 1.1 3 2.4 3.9 1 .7 2.2 1.1 3.4 1.1v3.3c-1.6 0-3.1-.4-4.5-1.2v6.6c0 3.4-2.8 6.3-6.3 6.3S4.4 18.1 4.4 14.7c0-3.2 2.5-5.9 5.6-6.2v3.4c-1.3.3-2.3 1.5-2.3 2.9 0 1.6 1.3 2.9 2.9 2.9s2.9-1.3 2.9-2.9V2z" fill="#25F4EE" transform="translate(-0.6,-0.6)"/><path d="M12.5 2h3.2c.2 1.6 1.1 3 2.4 3.9 1 .7 2.2 1.1 3.4 1.1v3.3c-1.6 0-3.1-.4-4.5-1.2v6.6c0 3.4-2.8 6.3-6.3 6.3S4.4 18.1 4.4 14.7c0-3.2 2.5-5.9 5.6-6.2v3.4c-1.3.3-2.3 1.5-2.3 2.9 0 1.6 1.3 2.9 2.9 2.9s2.9-1.3 2.9-2.9V2z" fill="#FE2C55" transform="translate(0.6,0.6)"/><path d="M12.5 2h3.2c.2 1.6 1.1 3 2.4 3.9 1 .7 2.2 1.1 3.4 1.1v3.3c-1.6 0-3.1-.4-4.5-1.2v6.6c0 3.4-2.8 6.3-6.3 6.3S4.4 18.1 4.4 14.7c0-3.2 2.5-5.9 5.6-6.2v3.4c-1.3.3-2.3 1.5-2.3 2.9 0 1.6 1.3 2.9 2.9 2.9s2.9-1.3 2.9-2.9V2z" fill="#fff"/></svg> TikTok</a><a href="https://www.facebook.com/profile.php?id=61592092803394" target="_blank" rel="noopener" class="social-link" style="display:inline-flex; align-items:center; gap:6px; color:#1877F2;"><svg width="18" height="18" viewBox="0 0 24 24" fill="#1877F2"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.3c-1.2 0-1.6.8-1.6 1.6V12h2.8l-.4 2.9h-2.4v7A10 10 0 0 0 22 12z"/></svg> Facebook</a>
+    </div>
+    <p style="font-size:13px; color:var(--ink-soft);"><a href="mailto:xlito.excel@gmail.com" class="social-link" style="color:#cdd8e6;"><svg width="16" height="16" viewBox="0 0 24 24" style="vertical-align:-3px; margin-right:4px;"><path d="M2 6.5v11A2.5 2.5 0 0 0 4.5 20H8V11.8L12 15l4-3.2V20h3.5a2.5 2.5 0 0 0 2.5-2.5v-11L12 13.5z" fill="#EA4335"/><path d="M8 20v-8.2L2 7.3V17.5A2.5 2.5 0 0 0 4.5 20H8z" fill="#4285F4"/><path d="M16 20v-8.2l6-4.5V17.5A2.5 2.5 0 0 1 19.5 20H16z" fill="#34A853"/><path d="M2 7.3l10 7.7 10-7.7-1.2-.9a2.4 2.4 0 0 0-2.9 0L12 10.3 6.1 6.4a2.4 2.4 0 0 0-2.9 0z" fill="#FBBC05"/></svg>xlito.excel@gmail.com</a> &nbsp;·&nbsp; <a href="https://wa.me/525567896394?text=Hola%2C%20me%20interesa%20el%20curso%20de%20Excel%20de%20XLito" target="_blank" rel="noopener" class="social-link" style="color:#25D366;"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-3px; margin-right:4px;"><path d="M12 2a10 10 0 0 0-8.5 15.2L2 22l4.9-1.5A10 10 0 1 0 12 2zm5.6 14.3c-.2.6-1.4 1.2-2 1.3-.5.1-1.1.1-1.8-.1-.4-.1-1-.3-1.6-.6-2.9-1.2-4.7-4.1-4.9-4.3-.1-.2-1.2-1.6-1.2-3 0-1.4.7-2.1 1-2.4.3-.3.6-.3.8-.3h.6c.2 0 .4 0 .6.5.2.5.7 1.8.8 1.9.1.2.1.4 0 .6-.1.2-.2.3-.4.5-.2.2-.4.4-.5.6-.2.2-.4.4-.2.7.2.3.9 1.5 2 2.4 1.3 1.2 2.4 1.6 2.8 1.7.3.1.5.1.7-.1.2-.2.8-.9 1-1.2.2-.3.5-.2.8-.1.3.1 1.9.9 2.2 1.1.3.1.5.2.6.3.1.2.1.9-.1 1.5z"/></svg>Escríbenos por WhatsApp</a></p>
+    <p class="fine">© 2026 XLito. Con XLito, tu Excel abre puertas.</p>
+  </div>
+</footer>
+
+<script src="nav.js"></script>
+<script src="effects.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('gameCanvas');
+  var ctx = canvas.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+  var W = canvas.width, H = canvas.height;
+
+  var startOverlay = document.getElementById('startOverlay');
+  var overOverlay = document.getElementById('overOverlay');
+  var quizOverlay = document.getElementById('quizOverlay');
+  var startBtn = document.getElementById('startBtn');
+  var retryBtn = document.getElementById('retryBtn');
+  var hudScore = document.getElementById('hud-score');
+  var hudBest = document.getElementById('hud-best');
+  var hudCombo = document.getElementById('hud-combo');
+  var hudComboN = document.getElementById('hud-combo-n');
+  var soundToggle = document.getElementById('soundToggle');
+
+  var BEST_KEY = 'xlito_rocket_best';
+  var best = parseInt(localStorage.getItem(BEST_KEY) || '0', 10);
+  hudBest.textContent = best;
+
+  /* ---------- Preguntas por dificultad ---------- */
+  var Q_EASY = [
+    { q:'¿Qué hace la función SI?', opts:['Suma valores','Evalúa una condición','Busca un valor'], correct:1 },
+    { q:'¿Qué combinación guarda un archivo?', opts:['Ctrl+G','Ctrl+P','Ctrl+B'], correct:0 },
+    { q:'¿Qué significa el error #DIV/0!?', opts:['División entre cero','Falta un paréntesis','Texto donde va número'], correct:0 },
+    { q:'¿Qué hace CONCATENAR?', opts:['Une texto','Resta números','Cuenta filas'], correct:0 },
+    { q:'¿Qué hace la función SUMA?', opts:['Suma valores','Cuenta celdas','Ordena datos'], correct:0 },
+    { q:'¿Qué hace PROMEDIO?', opts:['Calcula el promedio','Busca el máximo','Cuenta vacíos'], correct:0 },
+    { q:'¿Qué es una hoja de cálculo?', opts:['Un archivo con celdas','Un gráfico','Un documento de texto'], correct:0 },
+    { q:'¿Qué combinación copia?', opts:['Ctrl+C','Ctrl+V','Ctrl+X'], correct:0 },
+    { q:'¿Qué combinación pega?', opts:['Ctrl+C','Ctrl+V','Ctrl+Z'], correct:1 },
+    { q:'¿Qué hace Ctrl+Z?', opts:['Deshacer','Guardar','Buscar'], correct:0 },
+    { q:'¿Qué significa #NOMBRE??', opts:['Excel no reconoce el texto de la fórmula','Falta una celda','Hay texto en vez de número'], correct:0 },
+    { q:'¿Cuál NO es un tipo de gráfico?', opts:['Barras','Pastel','Word'], correct:2 },
+    { q:'¿Qué es una celda?', opts:['La intersección de fila y columna','Una hoja completa','Un archivo'], correct:0 },
+    { q:'¿Qué hace MAYUSC?', opts:['Convierte texto a mayúsculas','Cuenta letras','Ordena texto'], correct:0 }
+  ];
+  var Q_MED = [
+    { q:'¿BUSCARV busca en qué dirección?', opts:['Hacia la izquierda','Hacia la derecha','Hacia arriba'], correct:1 },
+    { q:'¿Qué función cuenta celdas con una condición?', opts:['SUMA','CONTAR.SI','PROMEDIO'], correct:1 },
+    { q:'¿Qué es una referencia absoluta?', opts:['Cambia al copiar','No cambia al copiar ($)','Solo en la fila 1'], correct:1 },
+    { q:'¿Qué hace una tabla dinámica?', opts:['Resume datos rápido','Borra duplicados','Cambia el color'], correct:0 },
+    { q:'¿Qué hace SUMAR.SI?', opts:['Suma con una condición','Cuenta filas vacías','Ordena de mayor a menor'], correct:0 },
+    { q:'¿Qué hace la función Y en lógica?', opts:['Se cumple si TODAS las condiciones son verdaderas','Se cumple si UNA es verdadera','Niega una condición'], correct:0 },
+    { q:'¿Qué hace formato condicional?', opts:['Resalta celdas según reglas','Protege una hoja','Combina celdas'], correct:0 },
+    { q:'¿Qué hace IZQUIERDA en un texto?', opts:['Extrae caracteres desde la izquierda','Alinea el texto','Cuenta palabras'], correct:0 },
+    { q:'¿Qué hace validación de datos?', opts:['Limita lo que se puede escribir en una celda','Valida fórmulas','Corrige ortografía'], correct:0 },
+    { q:'¿Qué hace SI.ERROR?', opts:['Muestra algo distinto si hay error','Elimina errores automáticamente','Cuenta errores'], correct:0 },
+    { q:'¿Qué combinación abre buscar y reemplazar?', opts:['Ctrl+B / Ctrl+L','Ctrl+F','Ctrl+R'], correct:0 }
+  ];
+  var Q_HARD = [
+    { q:'¿Qué ventaja tiene BUSCARX sobre BUSCARV?', opts:['Busca en cualquier dirección','Solo funciona con texto','Es más lento'], correct:0 },
+    { q:'¿ÍNDICE/COINCIDIR reemplaza a...?', opts:['SUMA','BUSCARV','Formato condicional'], correct:1 },
+    { q:'¿Qué hace SUMAR.SI.CONJUNTO?', opts:['Suma con varias condiciones','Cuenta celdas vacías','Ordena datos'], correct:0 },
+    { q:'¿Qué necesita una macro para grabarse?', opts:['Solo un clic','La grabadora de macros','Internet'], correct:1 },
+    { q:'¿Qué hace la función CARACTER?', opts:['Devuelve un carácter según código Unicode','Cuenta caracteres','Cambia mayúsculas'], correct:0 },
+    { q:'¿Qué permite un nombre de rango?', opts:['Referirte a un rango con una palabra', 'Cambiar el color de una celda', 'Ordenar automáticamente'], correct:0 },
+    { q:'¿Qué hace DIAS.LAB?', opts:['Calcula días laborables entre fechas','Cuenta laboratorios','Suma horas'], correct:0 },
+    { q:'¿Qué distingue una referencia mixta?', opts:['Fija solo fila o solo columna','Fija fila y columna','No fija nada'], correct:0 },
+    { q:'¿Qué hace un gráfico dinámico?', opts:['Se actualiza junto con una tabla dinámica','Es un gráfico animado','Cambia de tipo solo'], correct:0 },
+    { q:'¿Qué es un array/matriz en Excel?', opts:['Un conjunto de valores que se procesan juntos','Una sola celda','Un tipo de gráfico'], correct:0 }
+  ];
+  var lastQIndex = -1;
+  function pickQuestion(score){
+    var pool = score < 200 ? Q_EASY : (score < 500 ? Q_MED : Q_HARD);
+    var idx;
+    do { idx = Math.floor(Math.random()*pool.length); } while(pool.length > 1 && idx === lastQIndex);
+    lastQIndex = idx;
+    return pool[idx];
+  }
+
+  var FUNC_LABELS = ['SUMA','SI','BUSCARV','PROMEDIO','CONTAR.SI','ÍNDICE'];
+  var ERROR_LABELS = ['#REF!','#VALOR!','#DIV/0!','#N/A','#NOMBRE?','#NULO!'];
+
+  /* ---------- Audio (Web Audio API, sin archivos externos) ---------- */
+  var AudioCtx = window.AudioContext || window.webkitAudioContext;
+  var actx = null, musicOn = true, musicTimer = null;
+
+  // Melodía tipo 16-bit/SNES en La menor: línea de bajo + línea principal + un "hi-hat" percusivo
+  var BASS =  [110.0,110.0,146.8,146.8, 130.8,130.8,164.8,164.8, 110.0,110.0,146.8,146.8, 174.6,174.6,196.0,196.0];
+  var LEAD =  [440.0,523.3,440.0,349.2, 392.0,440.0,392.0,329.6, 440.0,523.3,587.3,523.3, 493.9,440.0,392.0,349.2];
+  var seqStep = 0;
+  function ensureAudio(){ if(!actx && AudioCtx) actx = new AudioCtx(); }
+  function beep(freq, dur, type, vol, when){
+    if(!musicOn || !actx) return;
+    var osc = actx.createOscillator();
+    var gain = actx.createGain();
+    osc.type = type || 'square';
+    osc.frequency.value = freq;
+    var t0 = when || actx.currentTime;
+    gain.gain.setValueAtTime(vol || 0.05, t0);
+    gain.gain.exponentialRampToValueAtTime(0.001, t0 + dur);
+    osc.connect(gain).connect(actx.destination);
+    osc.start(t0);
+    osc.stop(t0 + dur + 0.02);
+  }
+  function noiseHit(vol, when){
+    if(!musicOn || !actx) return;
+    var bufferSize = actx.sampleRate * 0.03;
+    var buffer = actx.createBuffer(1, bufferSize, actx.sampleRate);
+    var data = buffer.getChannelData(0);
+    for(var i=0;i<bufferSize;i++){ data[i] = (Math.random()*2-1) * (1 - i/bufferSize); }
+    var noise = actx.createBufferSource();
+    noise.buffer = buffer;
+    var gain = actx.createGain();
+    gain.gain.value = vol || 0.04;
+    noise.connect(gain).connect(actx.destination);
+    noise.start(when || actx.currentTime);
+  }
+  function playMusicStep(){
+    if(!musicOn || !actx) return;
+    var t = actx.currentTime;
+    var i = seqStep % LEAD.length;
+    beep(BASS[i], 0.22, 'triangle', 0.05, t);
+    beep(LEAD[i], 0.16, 'square', 0.045, t);
+    if(i % 2 === 1) noiseHit(0.035, t);
+    seqStep++;
+  }
+  function startMusic(){
+    ensureAudio();
+    if(musicTimer) clearInterval(musicTimer);
+    seqStep = 0;
+    musicTimer = setInterval(playMusicStep, 140);
+  }
+  function stopMusic(){ if(musicTimer) clearInterval(musicTimer); }
+  function sfxCollect(){ beep(660, 0.09, 'square', 0.08); setTimeout(function(){ beep(880,0.09,'square',0.07); }, 60); }
+  function sfxHit(){ beep(110, 0.4, 'sawtooth', 0.1); }
+  function sfxCorrect(){ beep(520,0.1,'square',0.09); setTimeout(function(){ beep(780,0.14,'square',0.09); },90); setTimeout(function(){ beep(1040,0.18,'square',0.08); },180); }
+  function sfxWrong(){ beep(160,0.28,'sawtooth',0.08); }
+
+  soundToggle.addEventListener('click', function(){
+    musicOn = !musicOn;
+    soundToggle.textContent = musicOn ? '🔊 ON' : '🔇 OFF';
+    if(musicOn) startMusic(); else stopMusic();
+  });
+
+  /* ---------- Estado del juego ---------- */
+  var state, raf, keys = {};
+
+  function resetState(){
+    state = {
+      running:false, paused:false,
+      rocketY: H/2, rocketVY: 0,
+      score: 0, speed: 2.0,
+      spawnTimer: 0,
+      obstacles: [],
+      combo: 0, multiplier: 1,
+      frame:0,
+      nextQuizFrame: 600 + Math.random()*60 // ~10s a 60fps
+    };
+    lastQIndex = -1;
+    hudScore.textContent = '0';
+    hudComboN.textContent = '1';
+    hudCombo.classList.remove('active');
+  }
+  resetState();
+
+  window.addEventListener('keydown', function(e){
+    if(['ArrowUp','ArrowDown','w','s','W','S'].indexOf(e.key) !== -1){ keys[e.key] = true; e.preventDefault(); }
+  });
+  window.addEventListener('keyup', function(e){ keys[e.key] = false; });
+
+  var dragging = false;
+  canvas.addEventListener('pointerdown', function(e){ dragging = true; movePointer(e); });
+  canvas.addEventListener('pointermove', function(e){ if(dragging) movePointer(e); });
+  window.addEventListener('pointerup', function(){ dragging = false; });
+  function movePointer(e){
+    if(!state.running || state.paused) return;
+    var rect = canvas.getBoundingClientRect();
+    var y = (e.clientY - rect.top) * (H / rect.height);
+    state.rocketY = Math.max(20, Math.min(H-20, y));
+  }
+
+  function spawnObstacle(){
+    var isFunc = Math.random() < 0.34;
+    var y = 40 + Math.random() * (H - 80);
+    if(isFunc){
+      state.obstacles.push({ type:'func', x:W+30, y:y, r:24, label: FUNC_LABELS[Math.floor(Math.random()*FUNC_LABELS.length)] });
+    } else {
+      state.obstacles.push({ type:'error', x:W+30, y:y, r:27, label: ERROR_LABELS[Math.floor(Math.random()*ERROR_LABELS.length)] });
+    }
+  }
+
+  function update(){
+    if(!state.running || state.paused) return;
+    state.frame++;
+
+    if(keys['ArrowUp'] || keys['w'] || keys['W']) state.rocketVY = -4.0;
+    else if(keys['ArrowDown'] || keys['s'] || keys['S']) state.rocketVY = 4.0;
+    else state.rocketVY *= 0.85;
+    state.rocketY += state.rocketVY;
+    state.rocketY = Math.max(20, Math.min(H-20, state.rocketY));
+
+    // curva de dificultad mucho más suave: arranca lento y sube gradual, con techo
+    state.speed = 2.0 + Math.min(2.8, state.frame/2600);
+    state.spawnTimer++;
+    var interval = Math.max(58, 120 - state.frame/55);
+    if(state.spawnTimer > interval){
+      state.spawnTimer = 0;
+      spawnObstacle();
+    }
+
+    for(var i = state.obstacles.length-1; i >= 0; i--){
+      var o = state.obstacles[i];
+      o.x -= state.speed;
+      var dx = o.x - 60, dy = o.y - state.rocketY;
+      var dist = Math.sqrt(dx*dx+dy*dy);
+      if(dist < o.r + 17){
+        if(o.type === 'func'){
+          state.combo++;
+          state.multiplier = 1 + Math.floor(state.combo/4);
+          state.score += 10 * state.multiplier;
+          hudComboN.textContent = state.multiplier;
+          hudCombo.classList.toggle('active', state.multiplier > 1);
+          sfxCollect();
+          state.obstacles.splice(i,1);
+          continue;
+        } else {
+          sfxHit();
+          endGame();
+          return;
+        }
+      }
+      if(o.x < -30) state.obstacles.splice(i,1);
+    }
+
+    state.score += 0.12 * state.multiplier;
+    hudScore.textContent = Math.floor(state.score);
+
+    if(state.frame > state.nextQuizFrame){
+      state.nextQuizFrame = state.frame + 560 + Math.random()*80; // ~9-11s a 60fps
+      showQuiz();
+    }
+  }
+
+  /* ---------- Dibujo estilo pixel-art ---------- */
+  function pixelRect(x, y, w, h, color){
+    ctx.fillStyle = color;
+    ctx.fillRect(Math.round(x), Math.round(y), w, h);
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    // fondo estrellado retro
+    ctx.fillStyle = '#101a2c';
+    ctx.fillRect(0,0,W,H);
+    for(var s=0; s<40; s++){
+      var sx = (s*67 + (state.frame*0.6)) % W;
+      var sy = (s*131) % H;
+      pixelRect(sx, sy, 2, 2, s%3===0 ? '#7fd4d4' : '#33465e');
+    }
+
+    state.obstacles.forEach(function(o){
+      var size = o.r*1.6;
+      var bx = o.x - size/2, by = o.y - size/2;
+      if(o.type === 'error'){
+        pixelRect(bx, by, size, size, '#3a0f0f');
+        pixelRect(bx+3, by+3, size-6, size-6, '#ff5d5d');
+        ctx.fillStyle = '#fff0f0';
+      } else {
+        pixelRect(bx, by, size, size, '#0b4a3d');
+        pixelRect(bx+3, by+3, size-6, size-6, '#1D9E75');
+        ctx.fillStyle = '#eafff5';
+      }
+      ctx.font = "11px 'Press Start 2P', monospace";
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(o.label, o.x, o.y+1);
+    });
+
+    // cohete pixelado (bloques)
+    var rx = 60, ry = state.rocketY;
+    var tilt = Math.max(-6, Math.min(6, state.rocketVY*1.4));
+    ctx.save();
+    ctx.translate(rx, ry + 0);
+    ctx.rotate(tilt * Math.PI/180);
+    pixelRect(-5,-13, 26, 26, '#004080');
+    pixelRect(-18,-5, 15, 10, '#008080');
+    pixelRect(18,-4, 8, 8, '#ffd88a');
+    pixelRect(-10,13, 8, 8, state.frame%6<3 ? '#ff8a3d' : '#ffd88a');
+    pixelRect(3,13, 8, 8, state.frame%6<3 ? '#ffd88a' : '#ff8a3d');
+    ctx.restore();
+  }
+
+  function loop(){
+    update();
+    draw();
+    raf = requestAnimationFrame(loop);
+  }
+
+  function startGame(){
+    ensureAudio();
+    resetState();
+    state.running = true;
+    startOverlay.style.display = 'none';
+    overOverlay.style.display = 'none';
+    startMusic();
+    if(!raf) raf = requestAnimationFrame(loop);
+  }
+
+  function endGame(){
+    state.running = false;
+    stopMusic();
+    var finalScore = Math.floor(state.score);
+    if(finalScore > best){
+      best = finalScore;
+      localStorage.setItem(BEST_KEY, String(best));
+      hudBest.textContent = best;
+    }
+    document.getElementById('overScore').textContent = 'PUNTAJE: ' + finalScore + (finalScore >= best ? ' — ¡RÉCORD!' : '');
+    overOverlay.style.display = 'flex';
+  }
+
+  function showQuiz(){
+    state.paused = true;
+    var qData = pickQuestion(state.score);
+    document.getElementById('quizQuestion').textContent = qData.q;
+    var optsWrap = document.getElementById('quizOptions');
+    optsWrap.innerHTML = '';
+    var answered = false;
+    var fill = document.getElementById('quizTimerFill');
+    fill.style.transition = 'none';
+    fill.style.width = '100%';
+    void fill.offsetWidth;
+    fill.style.transition = 'width 6s linear';
+    fill.style.width = '0%';
+
+    var timeoutId = setTimeout(function(){ resolveQuiz(false); }, 6000);
+
+    qData.opts.forEach(function(opt, i){
+      var btn = document.createElement('button');
+      btn.className = 'quiz-opt';
+      btn.textContent = opt;
+      btn.addEventListener('click', function(){
+        if(answered) return;
+        answered = true;
+        clearTimeout(timeoutId);
+        resolveQuiz(i === qData.correct);
+      });
+      optsWrap.appendChild(btn);
+    });
+
+    function resolveQuiz(correct){
+      if(correct){ state.score += 50; hudScore.textContent = Math.floor(state.score); sfxCorrect(); }
+      else { sfxWrong(); }
+      quizOverlay.style.display = 'none';
+      state.paused = false;
+    }
+    quizOverlay.style.display = 'flex';
+  }
+
+  startBtn.addEventListener('click', startGame);
+  retryBtn.addEventListener('click', startGame);
+  draw();
+})();
+</script>
+</body>
+</html>

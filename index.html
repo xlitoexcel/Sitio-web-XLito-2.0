@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>XLito — Con XLito, tu Excel abre puertas</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<style>
+  .hero{padding:110px 0 88px; text-align:center; background:linear-gradient(160deg, var(--bg-alt) 0%, #e8f4f4 55%, var(--bg-alt) 100%);}
+  .hero h1{font-size:clamp(34px,5vw,56px); max-width:820px; margin:0 auto 22px; line-height:1.15;}
+  .hero p.lead{font-size:18px; color:var(--ink-soft); max-width:560px; margin:0 auto 36px;}
+  .hero .cta-row{display:flex; gap:14px; justify-content:center; flex-wrap:wrap;}
+  .hero .fine{margin-top:20px; font-size:13px; color:var(--muted);}
+
+  .teaser-grid{display:grid; grid-template-columns:1fr; gap:20px;}
+  @media(min-width:760px){.teaser-grid{grid-template-columns:repeat(3,1fr);}}
+  .teaser{
+    border:1px solid var(--line); border-radius:var(--radius); padding:30px 26px;
+    display:flex; flex-direction:column; gap:12px; position:relative; overflow:hidden;
+    background:var(--bg);
+  }
+  .teaser::before{
+    content:""; position:absolute; top:0; left:0; right:0; height:5px;
+    background:linear-gradient(90deg, var(--accent), var(--accent-2), var(--accent-mint));
+  }
+  .teaser::after{
+    content:""; position:absolute; top:-40px; right:-40px; width:120px; height:120px;
+    background:radial-gradient(circle, var(--accent-mint) 0%, transparent 70%);
+    opacity:.35; border-radius:50%; pointer-events:none;
+  }
+  .teaser h3{ font-size:20px; color:var(--accent); }
+  .teaser p{ font-size:14px; color:var(--ink-soft); flex-grow:1; position:relative; }
+  .teaser a{ font-size:14px; font-weight:700; text-decoration:none; color:var(--accent-2); position:relative; }
+  .teaser a:hover{ text-decoration:underline; }
+  .teaser:hover{
+    transform:translateY(-4px) scale(1.035);
+    box-shadow:0 16px 32px rgba(0,64,128,.14);
+    border-color:var(--accent-2);
+    z-index:2;
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="index.html" class="logo-mark" style="display:flex; align-items:center; gap:8px;"><img src="assets/logo-icon.png" alt="XLito" style="height:62px; width:auto; margin:-10px 0;">XLito <span>· Excel</span></a>
+    <div class="nav-menu">
+      <button class="nav-menu-btn" id="nav-menu-btn" aria-expanded="false" aria-controls="nav-panel">Explorar el sitio <span class="chev">▾</span></button>
+      <div class="nav-panel" id="nav-panel">
+        <div><p class="nav-group-title">El curso</p>
+          <a href="niveles.html">Niveles, temarios y precios</a>
+          <a href="como-funciona.html">Cómo funciona</a>
+        </div>
+        <div><p class="nav-group-title">Conócenos</p>
+          <a href="nosotros.html">Sobre XLito</a>
+          <a href="testimonios.html">Testimonios</a>
+          <a href="faq.html">Preguntas frecuentes</a>
+        </div>
+        <div><p class="nav-group-title">Empieza</p>
+          <a href="recursos.html">Recursos gratis</a>
+          <a href="quiz.html">¿Qué nivel soy?</a>
+          <a href="juego-cohete.html">Juega: Cohete XLito</a>
+          <a href="inscripcion.html">Inscripción</a>
+        </div>
+      </div>
+    </div>
+    <a href="inscripcion.html" class="btn" style="display:none;" id="nav-cta">Inscríbete</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">Cursos de Excel en línea · Fines de semana</p>
+    <div id="hero-logo-title" style="position:relative; display:inline-block;">
+      <img src="assets/logo-icon.png" alt="XLito" style="position:absolute; right:100%; top:-6px; height:118px; width:auto; margin-right:-4px;">
+      <h1 style="margin:0; text-align:center;">Con XLito, tu Excel abre puertas</h1>
+    </div>
+    <p class="lead">Aprende Excel desde cero, a tu ritmo, los sábados y domingos. Grupos pequeños, precios accesibles y un instructor que te acompaña en cada paso.</p>
+    <div class="cta-row">
+      <a href="inscripcion.html" class="btn">Inscríbete al curso</a>
+      <a href="niveles.html" class="btn btn-outline">Ver niveles y temario</a>
+    </div>
+    <p class="fine">Próximo grupo piloto — cupo limitado</p>
+    <div style="margin-top:28px; padding-top:24px; border-top:1px solid var(--line); max-width:420px; margin-left:auto; margin-right:auto;">
+      <p style="font-size:14px; color:var(--ink-soft); margin-bottom:12px;">¿No sabes en qué nivel inscribirte? Mídete gratis:</p>
+      <a href="quiz.html" class="btn btn-outline">Descubre tu nivel de Excel →</a>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Explora</p>
+      <h2>Todo lo que necesitas saber</h2>
+    </div>
+    <div class="teaser-grid">
+      <div class="teaser">
+        <h3>Niveles y precios</h3>
+        <p>Introductorio, básico e intermedio — con temario sesión por sesión y descuentos por pago de contado.</p>
+        <a href="niveles.html">Ver niveles →</a>
+      </div>
+      <div class="teaser">
+        <h3>Sobre XLito</h3>
+        <p>Quién da las clases, y la misión detrás de un curso pensado para que Excel deje de dar miedo.</p>
+        <a href="nosotros.html">Conóceme →</a>
+      </div>
+      <div class="teaser">
+        <h3>Cómo funciona</h3>
+        <p>De la inscripción a tu primera clase: el proceso paso a paso y lo que necesitas para tomar el curso.</p>
+        <a href="como-funciona.html">Ver el proceso →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-logo" id="footer-logo" style="display:flex; align-items:center; justify-content:center; gap:8px;">
+      <img src="assets/logo-icon.png" alt="" style="height:32px; width:auto;">
+      <span style="font-family:var(--serif); font-weight:800; font-size:22px; background:linear-gradient(135deg, #ffffff, #ffd88a); -webkit-background-clip:text; background-clip:text; color:transparent;">XLito</span>
+    </div>
+    <div class="socials">
+      <a href="https://www.instagram.com/xlito_excel" target="_blank" rel="noopener" class="social-link" style="display:inline-flex; align-items:center; gap:6px; color:#D6249F;"><svg width="18" height="18" viewBox="0 0 24 24"><defs><linearGradient id="igGrad" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#FEE411"/><stop offset="35%" stop-color="#FD5949"/><stop offset="70%" stop-color="#D6249F"/><stop offset="100%" stop-color="#285AEB"/></linearGradient></defs><rect x="2" y="2" width="20" height="20" rx="5" fill="none" stroke="url(#igGrad)" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="url(#igGrad)" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1.2" fill="url(#igGrad)"/></svg> Instagram</a><a href="https://www.tiktok.com/@xlito_excel" target="_blank" rel="noopener" class="social-link" style="display:inline-flex; align-items:center; gap:6px; color:#e5e9ef;"><svg width="18" height="18" viewBox="0 0 24 24" fill="#000"><path d="M12.5 2h3.2c.2 1.6 1.1 3 2.4 3.9 1 .7 2.2 1.1 3.4 1.1v3.3c-1.6 0-3.1-.4-4.5-1.2v6.6c0 3.4-2.8 6.3-6.3 6.3S4.4 18.1 4.4 14.7c0-3.2 2.5-5.9 5.6-6.2v3.4c-1.3.3-2.3 1.5-2.3 2.9 0 1.6 1.3 2.9 2.9 2.9s2.9-1.3 2.9-2.9V2z" fill="#25F4EE" transform="translate(-0.6,-0.6)"/><path d="M12.5 2h3.2c.2 1.6 1.1 3 2.4 3.9 1 .7 2.2 1.1 3.4 1.1v3.3c-1.6 0-3.1-.4-4.5-1.2v6.6c0 3.4-2.8 6.3-6.3 6.3S4.4 18.1 4.4 14.7c0-3.2 2.5-5.9 5.6-6.2v3.4c-1.3.3-2.3 1.5-2.3 2.9 0 1.6 1.3 2.9 2.9 2.9s2.9-1.3 2.9-2.9V2z" fill="#FE2C55" transform="translate(0.6,0.6)"/><path d="M12.5 2h3.2c.2 1.6 1.1 3 2.4 3.9 1 .7 2.2 1.1 3.4 1.1v3.3c-1.6 0-3.1-.4-4.5-1.2v6.6c0 3.4-2.8 6.3-6.3 6.3S4.4 18.1 4.4 14.7c0-3.2 2.5-5.9 5.6-6.2v3.4c-1.3.3-2.3 1.5-2.3 2.9 0 1.6 1.3 2.9 2.9 2.9s2.9-1.3 2.9-2.9V2z" fill="#fff"/></svg> TikTok</a><a href="https://www.facebook.com/profile.php?id=61592092803394" target="_blank" rel="noopener" class="social-link" style="display:inline-flex; align-items:center; gap:6px; color:#1877F2;"><svg width="18" height="18" viewBox="0 0 24 24" fill="#1877F2"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.3c-1.2 0-1.6.8-1.6 1.6V12h2.8l-.4 2.9h-2.4v7A10 10 0 0 0 22 12z"/></svg> Facebook</a>
+    </div>
+    <p style="font-size:13px; color:var(--ink-soft);"><a href="mailto:xlito.excel@gmail.com" class="social-link" style="color:#cdd8e6;"><svg width="16" height="16" viewBox="0 0 24 24" style="vertical-align:-3px; margin-right:4px;"><path d="M2 6.5v11A2.5 2.5 0 0 0 4.5 20H8V11.8L12 15l4-3.2V20h3.5a2.5 2.5 0 0 0 2.5-2.5v-11L12 13.5z" fill="#EA4335"/><path d="M8 20v-8.2L2 7.3V17.5A2.5 2.5 0 0 0 4.5 20H8z" fill="#4285F4"/><path d="M16 20v-8.2l6-4.5V17.5A2.5 2.5 0 0 1 19.5 20H16z" fill="#34A853"/><path d="M2 7.3l10 7.7 10-7.7-1.2-.9a2.4 2.4 0 0 0-2.9 0L12 10.3 6.1 6.4a2.4 2.4 0 0 0-2.9 0z" fill="#FBBC05"/></svg>xlito.excel@gmail.com</a> &nbsp;·&nbsp; <a href="https://wa.me/525567896394?text=Hola%2C%20me%20interesa%20el%20curso%20de%20Excel%20de%20XLito" target="_blank" rel="noopener" class="social-link" style="color:#25D366;"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-3px; margin-right:4px;"><path d="M12 2a10 10 0 0 0-8.5 15.2L2 22l4.9-1.5A10 10 0 1 0 12 2zm5.6 14.3c-.2.6-1.4 1.2-2 1.3-.5.1-1.1.1-1.8-.1-.4-.1-1-.3-1.6-.6-2.9-1.2-4.7-4.1-4.9-4.3-.1-.2-1.2-1.6-1.2-3 0-1.4.7-2.1 1-2.4.3-.3.6-.3.8-.3h.6c.2 0 .4 0 .6.5.2.5.7 1.8.8 1.9.1.2.1.4 0 .6-.1.2-.2.3-.4.5-.2.2-.4.4-.5.6-.2.2-.4.4-.2.7.2.3.9 1.5 2 2.4 1.3 1.2 2.4 1.6 2.8 1.7.3.1.5.1.7-.1.2-.2.8-.9 1-1.2.2-.3.5-.2.8-.1.3.1 1.9.9 2.2 1.1.3.1.5.2.6.3.1.2.1.9-.1 1.5z"/></svg>Escríbenos por WhatsApp</a></p>
+    <p class="fine">© 2026 XLito. Con XLito, tu Excel abre puertas.</p>
+  </div>
+</footer>
+
+<script src="nav.js"></script>
+<script src="effects.js"></script>
+</body>
+</html>
