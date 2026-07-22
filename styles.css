@@ -547,3 +547,58 @@ footer .fine{font-size:12px; color:var(--muted);}
 
 .visually-hidden{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0);}
 @media (prefers-reduced-motion: reduce){ *{transition:none !important;} }
+
+/* ============================================
+   RESPONSIVO — celular y pantallas angostas
+============================================ */
+@media (max-width: 640px){
+  .wrap{padding:0 16px;}
+  section{padding:48px 0;}
+
+  /* Header / nav */
+  nav .wrap{padding:12px 16px; gap:8px;}
+  nav .logo-mark{font-size:16px !important; gap:6px !important;}
+  nav .logo-mark img{height:34px !important; margin:0 !important;}
+  .logo-mark span{display:none;}
+  .nav-menu-btn{padding:7px 12px; font-size:12px; white-space:nowrap;}
+  .nav-panel{width:92vw; grid-template-columns:1fr; padding:16px;}
+  nav .wrap > a.btn{padding:9px 14px; font-size:12px;}
+
+  /* Hero (index.html) — logo y título apilados, ya no lado a lado */
+  #hero-logo-title{display:flex !important; flex-direction:column; align-items:center; gap:6px;}
+  #hero-logo-title img{
+    position:static !important; height:64px !important; width:auto !important;
+    margin:0 0 4px 0 !important; right:auto !important; top:auto !important;
+  }
+  .hero h1{font-size:clamp(26px,8vw,34px) !important;}
+  .hero .lead, .hero p.lead{font-size:14px;}
+  .hero .cta-row{flex-direction:column; align-items:stretch;}
+  .hero .cta-row .btn{width:100%; text-align:center;}
+
+  .page-hero h1{font-size:clamp(24px,7vw,32px);}
+  .page-hero p{font-size:14px; padding:0 6px;}
+
+  .section-head h2{font-size:24px;}
+
+  /* Tarjetas y grids a una columna */
+  .levels, .teaser-grid, .steps, .req-grid, .mvv-grid, .values-grid, .block-scores{
+    grid-template-columns:1fr !important;
+  }
+  .about-grid{grid-template-columns:1fr !important;}
+
+  /* Footer */
+  .socials{flex-wrap:wrap; justify-content:center; gap:12px !important;}
+  footer .fine, footer p{font-size:12px;}
+
+  /* Tablas: permiten scroll horizontal en vez de romperse */
+  .price-table-wrap, table.price-table{display:block; overflow-x:auto; -webkit-overflow-scrolling:touch;}
+
+  /* Quiz y juego */
+  .quiz-wrap, .game-wrap{padding:0 4px;}
+}
+
+@media (max-width: 400px){
+  nav .logo-mark{font-size:14px !important;}
+  nav .logo-mark img{height:28px !important;}
+  .hero h1{font-size:22px !important;}
+}
