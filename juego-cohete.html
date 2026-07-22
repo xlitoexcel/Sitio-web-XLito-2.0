@@ -44,7 +44,7 @@
   .quiz-timer-bar{width:100%; max-width:300px; height:8px; background:#0a0e18; overflow:hidden; border:2px solid #7fd4d4;}
   .quiz-timer-fill{height:100%; background:#ffd88a;}
   .sound-toggle{
-    position:absolute; top:10px; right:10px; z-index:5; background:#101a2c; border:2px solid #7fd4d4;
+    background:#101a2c; border:2px solid #7fd4d4;
     color:#7fd4d4; font-family:'Press Start 2P', monospace; font-size:10px; padding:6px 10px; cursor:pointer;
   }
 </style>
@@ -70,6 +70,8 @@
           <a href="recursos.html">Recursos gratis</a>
           <a href="quiz.html">¿Qué nivel soy?</a>
           <a href="juego-cohete.html" class="current">Juega: Cohete XLito</a>
+          <a href="juego-memorama.html">Juega: Memorama</a>
+          <a href="juego-atajos.html">Juega: Trivia XLito</a>
           <a href="inscripcion.html">Inscripción</a>
         </div>
       </div>
@@ -92,15 +94,15 @@
       <div>SCORE: <strong id="hud-score">0</strong></div>
       <div class="combo-badge" id="hud-combo">COMBO x<span id="hud-combo-n">1</span></div>
       <div>BEST: <strong id="hud-best">0</strong></div>
+      <button class="sound-toggle" id="soundToggle">🔊 ON</button>
     </div>
 
     <div class="game-stage">
-      <button class="sound-toggle" id="soundToggle">🔊 ON</button>
       <canvas id="gameCanvas" width="900" height="440"></canvas>
 
       <div class="game-overlay" id="startOverlay">
         <h2 style="font-size:22px; color:#7fd4d4;">COHETE XLITO</h2>
-        <p style="max-width:400px; font-size:11px; color:#cfe0ea; line-height:1.8;">Usa ↑ ↓ o W/S para moverte, o arrastra en pantallas táctiles. Esquiva los errores rojos, recoge las funciones verdes y responde las preguntas relámpago.</p>
+        <p style="max-width:400px; font-size:11px; color:#cfe0ea; line-height:1.8;">Usa ↑ ↓ o W/S para moverte, ESPACIO para disparar (o toca en pantallas táctiles). Esquiva o dispara a los errores rojos, recoge las funciones verdes, responde las preguntas relámpago, y cuidado con el JEFE que llega cada 60 segundos.</p>
         <button class="btn pixel-font" id="startBtn" style="font-size:11px;">EMPEZAR</button>
       </div>
 
@@ -118,7 +120,7 @@
       </div>
     </div>
 
-    <p class="game-controls-hint">↑↓ / WS · TOCA Y ARRASTRA</p>
+    <p class="game-controls-hint">↑↓ / WS · ESPACIO DISPARA · TOCA Y ARRASTRA</p>
   </div>
 </section>
 
@@ -175,7 +177,13 @@
     { q:'¿Qué significa #NOMBRE??', opts:['Excel no reconoce el texto de la fórmula','Falta una celda','Hay texto en vez de número'], correct:0 },
     { q:'¿Cuál NO es un tipo de gráfico?', opts:['Barras','Pastel','Word'], correct:2 },
     { q:'¿Qué es una celda?', opts:['La intersección de fila y columna','Una hoja completa','Un archivo'], correct:0 },
-    { q:'¿Qué hace MAYUSC?', opts:['Convierte texto a mayúsculas','Cuenta letras','Ordena texto'], correct:0 }
+    { q:'¿Qué hace MAYUSC?', opts:['Convierte texto a mayúsculas','Cuenta letras','Ordena texto'], correct:0 },
+    { q:'¿Qué hace MIN?', opts:['Encuentra el valor más pequeño','Encuentra el más grande','Suma valores'], correct:0 },
+    { q:'¿Qué hace MAX?', opts:['Encuentra el valor más grande','Encuentra el más pequeño','Cuenta filas'], correct:0 },
+    { q:'¿Qué es una fórmula en Excel?', opts:['Una operación que empieza con "="','Un tipo de gráfico','Un color de celda'], correct:0 },
+    { q:'¿Qué hace Ctrl+X?', opts:['Cortar','Copiar','Pegar'], correct:0 },
+    { q:'¿Qué extensión usan los archivos de Excel?', opts:['.xlsx','.docx','.pptx'], correct:0 },
+    { q:'¿Qué es una columna?', opts:['Una línea vertical de celdas','Una línea horizontal de celdas','Una hoja completa'], correct:0 }
   ];
   var Q_MED = [
     { q:'¿BUSCARV busca en qué dirección?', opts:['Hacia la izquierda','Hacia la derecha','Hacia arriba'], correct:1 },
@@ -188,7 +196,11 @@
     { q:'¿Qué hace IZQUIERDA en un texto?', opts:['Extrae caracteres desde la izquierda','Alinea el texto','Cuenta palabras'], correct:0 },
     { q:'¿Qué hace validación de datos?', opts:['Limita lo que se puede escribir en una celda','Valida fórmulas','Corrige ortografía'], correct:0 },
     { q:'¿Qué hace SI.ERROR?', opts:['Muestra algo distinto si hay error','Elimina errores automáticamente','Cuenta errores'], correct:0 },
-    { q:'¿Qué combinación abre buscar y reemplazar?', opts:['Ctrl+B / Ctrl+L','Ctrl+F','Ctrl+R'], correct:0 }
+    { q:'¿Qué combinación abre buscar y reemplazar?', opts:['Ctrl+B / Ctrl+L','Ctrl+F','Ctrl+R'], correct:0 },
+    { q:'¿Qué hace la función O en lógica?', opts:['Se cumple si al menos UNA condición es verdadera','Se cumple solo si TODAS son verdaderas','Invierte el resultado'], correct:0 },
+    { q:'¿Qué hace ESPACIOS?', opts:['Quita espacios extra de un texto','Cuenta espacios','Agrega espacios'], correct:0 },
+    { q:'¿Qué hace NOMPROPIO?', opts:['Pone en mayúscula la primera letra de cada palabra','Cuenta nombres','Ordena alfabéticamente'], correct:0 },
+    { q:'¿Qué es congelar paneles?', opts:['Fijar filas/columnas visibles al hacer scroll','Bloquear una hoja con contraseña','Proteger fórmulas'], correct:0 }
   ];
   var Q_HARD = [
     { q:'¿Qué ventaja tiene BUSCARX sobre BUSCARV?', opts:['Busca en cualquier dirección','Solo funciona con texto','Es más lento'], correct:0 },
@@ -200,7 +212,10 @@
     { q:'¿Qué hace DIAS.LAB?', opts:['Calcula días laborables entre fechas','Cuenta laboratorios','Suma horas'], correct:0 },
     { q:'¿Qué distingue una referencia mixta?', opts:['Fija solo fila o solo columna','Fija fila y columna','No fija nada'], correct:0 },
     { q:'¿Qué hace un gráfico dinámico?', opts:['Se actualiza junto con una tabla dinámica','Es un gráfico animado','Cambia de tipo solo'], correct:0 },
-    { q:'¿Qué es un array/matriz en Excel?', opts:['Un conjunto de valores que se procesan juntos','Una sola celda','Un tipo de gráfico'], correct:0 }
+    { q:'¿Qué es un array/matriz en Excel?', opts:['Un conjunto de valores que se procesan juntos','Una sola celda','Un tipo de gráfico'], correct:0 },
+    { q:'¿Qué hace CODIGO (inversa de CARACTER)?', opts:['Devuelve el código Unicode de un carácter','Cifra una celda','Cuenta letras'], correct:0 },
+    { q:'¿Qué es un vínculo entre hojas?', opts:['Una fórmula que trae datos de otra hoja','Un hipervínculo web','Un tipo de gráfico'], correct:0 },
+    { q:'¿Qué hace HOY() en Excel?', opts:['Devuelve la fecha actual','Cuenta los días del mes','Suma fechas'], correct:0 }
   ];
   var lastQIndex = -1;
   function pickQuestion(score){
@@ -286,9 +301,12 @@
       score: 0, speed: 2.0,
       spawnTimer: 0,
       obstacles: [],
+      shots: [], enemyShots: [],
+      shootCooldown: 0,
+      boss: null, nextBossFrame: 3600, // ~60s a 60fps
       combo: 0, multiplier: 1,
       frame:0,
-      nextQuizFrame: 600 + Math.random()*60 // ~10s a 60fps
+      nextQuizFrame: 900 + Math.random()*300 // ~15-20s a 60fps
     };
     lastQIndex = -1;
     hudScore.textContent = '0';
@@ -298,12 +316,12 @@
   resetState();
 
   window.addEventListener('keydown', function(e){
-    if(['ArrowUp','ArrowDown','w','s','W','S'].indexOf(e.key) !== -1){ keys[e.key] = true; e.preventDefault(); }
+    if(['ArrowUp','ArrowDown','w','s','W','S',' '].indexOf(e.key) !== -1){ keys[e.key] = true; e.preventDefault(); }
   });
   window.addEventListener('keyup', function(e){ keys[e.key] = false; });
 
   var dragging = false;
-  canvas.addEventListener('pointerdown', function(e){ dragging = true; movePointer(e); });
+  canvas.addEventListener('pointerdown', function(e){ dragging = true; movePointer(e); fireShot(); });
   canvas.addEventListener('pointermove', function(e){ if(dragging) movePointer(e); });
   window.addEventListener('pointerup', function(){ dragging = false; });
   function movePointer(e){
@@ -313,14 +331,26 @@
     state.rocketY = Math.max(20, Math.min(H-20, y));
   }
 
+  function fireShot(){
+    if(!state.running || state.paused || state.shootCooldown > 0) return;
+    state.shots.push({ x:76, y:state.rocketY });
+    state.shootCooldown = 14;
+    beep(880, 0.05, 'square', 0.03);
+  }
+
   function spawnObstacle(){
     var isFunc = Math.random() < 0.34;
     var y = 40 + Math.random() * (H - 80);
     if(isFunc){
       state.obstacles.push({ type:'func', x:W+30, y:y, r:24, label: FUNC_LABELS[Math.floor(Math.random()*FUNC_LABELS.length)] });
     } else {
-      state.obstacles.push({ type:'error', x:W+30, y:y, r:27, label: ERROR_LABELS[Math.floor(Math.random()*ERROR_LABELS.length)] });
+      var pattern = Math.random() < 0.45 ? 'zigzag' : 'straight';
+      state.obstacles.push({ type:'error', x:W+30, y:y, baseY:y, r:27, label: ERROR_LABELS[Math.floor(Math.random()*ERROR_LABELS.length)], pattern:pattern, phase: Math.random()*Math.PI*2 });
     }
+  }
+
+  function spawnBoss(){
+    state.boss = { x:W-120, y:H/2, hp:6, maxHp:6, vy:1.6, shootTimer:70, hitFlash:0 };
   }
 
   function update(){
@@ -333,18 +363,57 @@
     state.rocketY += state.rocketVY;
     state.rocketY = Math.max(20, Math.min(H-20, state.rocketY));
 
+    if(state.shootCooldown > 0) state.shootCooldown--;
+    if(keys[' ']) fireShot();
+
     // curva de dificultad mucho más suave: arranca lento y sube gradual, con techo
     state.speed = 2.0 + Math.min(2.8, state.frame/2600);
-    state.spawnTimer++;
-    var interval = Math.max(58, 120 - state.frame/55);
-    if(state.spawnTimer > interval){
-      state.spawnTimer = 0;
-      spawnObstacle();
+
+    // jefe cada ~60s (se pausa el spawn normal de obstáculos mientras esté activo)
+    if(!state.boss && state.frame > state.nextBossFrame){
+      spawnBoss();
     }
 
+    if(!state.boss){
+      state.spawnTimer++;
+      var interval = Math.max(58, 120 - state.frame/55);
+      if(state.spawnTimer > interval){
+        state.spawnTimer = 0;
+        spawnObstacle();
+      }
+    }
+
+    // disparos del jugador
+    for(var s = state.shots.length-1; s >= 0; s--){
+      var sh = state.shots[s];
+      sh.x += 9;
+      if(sh.x > W+20){ state.shots.splice(s,1); continue; }
+    }
+
+    // obstáculos (errores/funciones)
     for(var i = state.obstacles.length-1; i >= 0; i--){
       var o = state.obstacles[i];
       o.x -= state.speed;
+      if(o.type === 'error' && o.pattern === 'zigzag'){
+        o.y = o.baseY + Math.sin(state.frame*0.05 + o.phase) * 40;
+      }
+
+      // impacto de disparo sobre error
+      if(o.type === 'error'){
+        for(var s2 = state.shots.length-1; s2 >= 0; s2--){
+          var sh2 = state.shots[s2];
+          if(Math.abs(sh2.x - o.x) < o.r && Math.abs(sh2.y - o.y) < o.r){
+            state.shots.splice(s2,1);
+            state.obstacles.splice(i,1);
+            state.score += 15 * state.multiplier;
+            sfxCollect();
+            o = null;
+            break;
+          }
+        }
+        if(!o) continue;
+      }
+
       var dx = o.x - 60, dy = o.y - state.rocketY;
       var dist = Math.sqrt(dx*dx+dy*dy);
       if(dist < o.r + 17){
@@ -366,11 +435,54 @@
       if(o.x < -30) state.obstacles.splice(i,1);
     }
 
+    // jefe
+    if(state.boss){
+      var b = state.boss;
+      b.y += b.vy;
+      if(b.y < 60 || b.y > H-60) b.vy *= -1;
+      if(b.hitFlash > 0) b.hitFlash--;
+
+      b.shootTimer--;
+      if(b.shootTimer <= 0){
+        b.shootTimer = 75;
+        state.enemyShots.push({ x:b.x-20, y:b.y, vx:-4.5 });
+      }
+
+      // disparo del jugador contra el jefe
+      for(var s3 = state.shots.length-1; s3 >= 0; s3--){
+        var sh3 = state.shots[s3];
+        if(Math.abs(sh3.x - b.x) < 34 && Math.abs(sh3.y - b.y) < 34){
+          state.shots.splice(s3,1);
+          b.hp--;
+          b.hitFlash = 6;
+          sfxCollect();
+          if(b.hp <= 0){
+            state.score += 300;
+            state.boss = null;
+            state.nextBossFrame = state.frame + 3600;
+          }
+        }
+      }
+    }
+
+    // disparos enemigos (del jefe)
+    for(var e = state.enemyShots.length-1; e >= 0; e--){
+      var es = state.enemyShots[e];
+      es.x += es.vx;
+      var edx = es.x - 60, edy = es.y - state.rocketY;
+      if(Math.sqrt(edx*edx+edy*edy) < 22){
+        sfxHit();
+        endGame();
+        return;
+      }
+      if(es.x < -20) state.enemyShots.splice(e,1);
+    }
+
     state.score += 0.12 * state.multiplier;
     hudScore.textContent = Math.floor(state.score);
 
     if(state.frame > state.nextQuizFrame){
-      state.nextQuizFrame = state.frame + 560 + Math.random()*80; // ~9-11s a 60fps
+      state.nextQuizFrame = state.frame + 900 + Math.random()*300; // ~15-20s a 60fps
       showQuiz();
     }
   }
@@ -409,6 +521,36 @@
       ctx.textBaseline = 'middle';
       ctx.fillText(o.label, o.x, o.y+1);
     });
+
+    // disparos del jugador
+    state.shots.forEach(function(sh){
+      pixelRect(sh.x-5, sh.y-2, 10, 4, '#ffd88a');
+    });
+    // disparos del jefe
+    state.enemyShots.forEach(function(es){
+      pixelRect(es.x-4, es.y-4, 8, 8, '#ff5d5d');
+    });
+
+    // jefe
+    if(state.boss){
+      var b = state.boss;
+      ctx.save();
+      ctx.translate(b.x, b.y);
+      var flashColor = b.hitFlash > 0 ? '#ffffff' : '#5a1a6b';
+      pixelRect(-32,-30, 64, 60, flashColor);
+      pixelRect(-24,-22, 48, 44, '#8a2be2');
+      pixelRect(-38,-6, 12, 12, '#5a1a6b');
+      pixelRect(26,-6, 12, 12, '#5a1a6b');
+      ctx.fillStyle = '#fff';
+      ctx.font = "10px 'Press Start 2P', monospace";
+      ctx.textAlign = 'center';
+      ctx.fillText('#JEFE', 0, 4);
+      ctx.restore();
+      // barra de vida
+      var barW = 120;
+      pixelRect(b.x-barW/2, b.y-46, barW, 8, '#0a0e18');
+      pixelRect(b.x-barW/2+2, b.y-44, (barW-4) * (b.hp/b.maxHp), 4, '#ff5d5d');
+    }
 
     // cohete pixelado (bloques)
     var rx = 60, ry = state.rocketY;
@@ -483,8 +625,15 @@
     });
 
     function resolveQuiz(correct){
-      if(correct){ state.score += 50; hudScore.textContent = Math.floor(state.score); sfxCorrect(); }
-      else { sfxWrong(); }
+      if(correct){
+        state.score += 50; hudScore.textContent = Math.floor(state.score); sfxCorrect();
+      } else {
+        sfxWrong();
+        state.combo = 0;
+        state.multiplier = 1;
+        hudComboN.textContent = 1;
+        hudCombo.classList.remove('active');
+      }
       quizOverlay.style.display = 'none';
       state.paused = false;
     }
